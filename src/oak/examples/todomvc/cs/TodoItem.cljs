@@ -1,6 +1,6 @@
 (ns oak.examples.todomvc.cs.TodoItem
   (:require
-    [oak.core :as oak]
+    [oak.component :as oak]
     [schema.core :as s]
     [oak.dom :as d]
     [cljs.core.match :refer-macros [match]]

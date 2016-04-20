@@ -1,6 +1,6 @@
 (ns oak.examples.todomvc.cs.TodoApp
   (:require
-    [oak.core :as oak]
+    [oak.component :as oak]
     [oak.dom :as d]
     [cljs.core.match :refer-macros [match]]
     [oak.examples.todomvc.cs.Header :as Header]
@@ -27,6 +27,7 @@
         (fn [e] (submit [:Footer e]))))))
 
 (defn step [[target event] state]
+  (println "Ev" target "<--" event)
   (match [target event]
     [:Header [:new-todo text]]
     (oak/step MainSection/root [:new-todo text] state)

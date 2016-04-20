@@ -1,7 +1,7 @@
 (ns oak.examples.todomvc.cs.Header
   (:require
     [oak.dom :as d]
-    [oak.core :as oak]
+    [oak.component :as oak]
     [schema.core :as s]))
 
 (def event

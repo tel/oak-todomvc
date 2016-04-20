@@ -1,7 +1,7 @@
 (ns oak.examples.todomvc.core
   (:require
     [oak.examples.todomvc.cs.TodoApp :as TodoApp]
-    [oak.core :as oak]))
+    [oak.component :as oak]))
 
 (enable-console-print!)
 

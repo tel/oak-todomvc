@@ -1,6 +1,6 @@
 (ns oak.examples.todomvc.cs.MainSection
   (:require
-    [oak.core :as oak]
+    [oak.component :as oak]
     [oak.dom :as d]
     [oak.examples.todomvc.cs.TodoItem :as TodoItem]
     [schema.core :as s]
@@ -39,6 +39,11 @@
     {:memory (persistent! store)
      :order new-order}))
 
+(defn ^:private destroy-todo [name state]
+  (-> state
+      (update :memory dissoc name)
+      (update :order (partial remove (partial = name)))))
+
 (defn step [event state]
   (match event
     :toggle-all
@@ -56,14 +61,14 @@
           (update :order conj id)))
 
     [name subevent]
-    (case subevent
-      :destroy (-> state
-                   (update :memory dissoc name)
-                   (update :order (partial remove (partial = name))))
+    (match subevent
+      :destroy (destroy-todo name state)
 
-      (update-in
-        state [:memory name]
-        (oak/step TodoItem/root subevent)))))
+      [:end-editing (text :guard empty?)] (destroy-todo name state)
+
+      :else (update-in
+              state [:memory name]
+              (oak/step TodoItem/root subevent)))))
 
 (defn view [{:keys [memory order]} submit]
   (d/section {:className :main}

@@ -1,6 +1,6 @@
 (ns oak.examples.todomvc.cs.Footer
   (:require
-    [oak.core :as oak]
+    [oak.component :as oak]
     [oak.dom :as d]
     [schema.core :as s]))
 
