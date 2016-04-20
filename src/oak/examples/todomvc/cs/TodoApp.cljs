@@ -6,9 +6,11 @@
     [oak.examples.todomvc.cs.Header :as Header]
     [oak.examples.todomvc.cs.MainSection :as MainSection]
     [oak.examples.todomvc.cs.Footer :as Footer]
-    [schema.core :as s]))
+    [schema.core :as s]
+    [oak.examples.todomvc.model :as model]))
 
-(def state (oak/state MainSection/root))
+(def state
+  {:todos (oak/state MainSection/root)})
 
 (def event
   (s/cond-pre
@@ -16,31 +18,38 @@
     (s/pair (s/eq :MainSection) :target (oak/event MainSection/root) :subevent)
     (s/pair (s/eq :Footer) :target (oak/event Footer/root) :subevent)))
 
-(defn view [{:keys [memory] :as state} submit]
-  (d/section {:className :todoapp}
-    (Header/root nil (fn [e] (submit [:Header e])))
-    (MainSection/root state (fn [e] (submit [:MainSection e])))
-
-    (when-not (empty? memory)
-      (Footer/root
-        {:todo-count (count memory)}
-        (fn [e] (submit [:Footer e]))))))
+(defn query [_state q]
+  {:location (q [:location :current])})
 
 (defn step [[target event] state]
   (match [target event]
     [:Header [:new-todo text]]
-    (oak/step MainSection/root [:new-todo text] state)
+    (update state :todos (oak/step MainSection/root [:new-todo text]))
 
     [:Footer :clear-completed]
-    (oak/step MainSection/root :clear-completed state)
+    (update state :todos (oak/step MainSection/root :clear-completed))
 
     [:MainSection subevent]
-    (oak/step MainSection/root subevent state)))
+    (update state :todos (oak/step MainSection/root subevent))))
+
+(defn view [[{:keys [todos]} {:keys [location]}] submit]
+  (d/section {:className :todoapp}
+    (Header/root nil (fn [e] (submit [:Header e])))
+    (MainSection/root todos (fn [e] (submit [:MainSection e])))
+
+    (let [memory (:memory todos)]
+      (when-not (empty? memory)
+        (Footer/root
+          {:todo-count     (count memory)
+           :location       location
+           :show-completed (model/some-todo :completed todos)}
+          (fn [e] (submit [:Footer e])))))))
 
 (def root
   (oak/make
     :name "TodoApp"
     :state state
+    :query query
     :event event
     :step step
     :view view))

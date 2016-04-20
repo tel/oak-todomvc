@@ -11,4 +11,5 @@
   (bidi/match-route routes str))
 
 (defn path-for [location & args]
-  (apply bidi/path-for routes location args))
+  (when-let [route (apply bidi/path-for routes location args)]
+    (str "#" route)))

@@ -5,10 +5,10 @@
 
 (enable-console-print!)
 
-(defn main []
-  (mount/start))
+(defn ^:export start [] (mount/start))
+(defn ^:export stop [] (mount/stop))
+(defn ^:export reload [] (stop) (start))
 
-(defn reload []
-  (mount/stop)
-  (main))
+(defn ^:export main [] (start))
+
 
