@@ -16,22 +16,26 @@
     (s/pair (s/eq :MainSection) :target (oak/event MainSection/root) :subevent)
     (s/pair (s/eq :Footer) :target (oak/event Footer/root) :subevent)))
 
-(defn view [{:keys [memory order] :as state} submit]
+(defn view [{:keys [memory] :as state} submit]
   (d/section {:className :todoapp}
     (Header/root nil (fn [e] (submit [:Header e])))
     (MainSection/root state (fn [e] (submit [:MainSection e])))
 
     (when-not (empty? memory)
-      (Footer/root nil (fn [e] (submit [:Footer e]))))))
+      (Footer/root
+        {:todo-count (count memory)}
+        (fn [e] (submit [:Footer e]))))))
 
 (defn step [[target event] state]
   (match [target event]
     [:Header [:new-todo text]]
     (oak/step MainSection/root [:new-todo text] state)
 
+    [:Footer :clear-completed]
+    (oak/step MainSection/root :clear-completed state)
+
     [:MainSection subevent]
     (oak/step MainSection/root subevent state)))
-
 
 (def root
   (oak/make

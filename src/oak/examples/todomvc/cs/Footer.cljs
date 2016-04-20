@@ -1,12 +1,21 @@
 (ns oak.examples.todomvc.cs.Footer
-  (:require [oak.core :as oak]
-            [oak.dom :as d]))
+  (:require
+    [oak.core :as oak]
+    [oak.dom :as d]
+    [schema.core :as s]))
 
-(defn view [_ _]
+(def state
+  {:todo-count s/Int})
+
+(defn view [{:keys [todo-count]} submit]
   (d/footer {:className :footer}
     ; Should be "0 items left" by default
     (d/span {:className :todo-count}
-      (d/strong {} "0") " " "items left")
+      (d/strong {} (str todo-count))
+      " "
+      (if (= 1 todo-count)
+        "item left"
+        "items left"))
     (d/ul {:className :filters}
       (d/li {}
         (d/a {:className :selected :href "#"}
@@ -18,7 +27,8 @@
         (d/a {:href "#/completed"}
           "Completed")))
     ; Hidden if no completed items left
-    (d/button {:className :clear-completed}
+    (d/button {:className :clear-completed
+               :onClick (fn [_] (submit :clear-completed))}
       "Clear completed")))
 
 (def root

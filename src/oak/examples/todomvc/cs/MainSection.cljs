@@ -13,6 +13,7 @@
 (def event
   (s/cond-pre
     :toggle-all
+    :clear-completed
     [:new-todo s/Str]
     [s/Str (oak/event TodoItem/root)]))
 
@@ -25,12 +26,28 @@
 (defn ^:private map-todos [f state]
   (update state :memory #(map-vals f %)))
 
+(defn ^:private filter-todos [p {:keys [memory order]}]
+  (let [store (transient memory)
+        new-order (doall
+                    (filter
+                     (fn [name]
+                       (let [item (get memory name)
+                             ok (p item)]
+                         (when-not (p item) (dissoc! store name))
+                         ok))
+                     order))]
+    {:memory (persistent! store)
+     :order new-order}))
+
 (defn step [event state]
   (match event
     :toggle-all
     (if (every-todo :completed state)
       (map-todos #(assoc % :completed false) state)
       (map-todos #(assoc % :completed true) state))
+
+    :clear-completed
+    (filter-todos (complement :completed) state)
 
     [:new-todo text]
     (let [{:keys [id] :as new-todo-state} (TodoItem/fresh text)]
@@ -58,7 +75,7 @@
                           (TodoItem/root
                             (get memory name)
                             (fn [ev] (submit [name ev]))))
-                        (reverse order))]
+                        order)]
       (apply d/ul {:className :todo-list} children))))
 
 (def root

@@ -38,7 +38,7 @@
       (d/input {:className :toggle
                 :type      :checkbox
                 :checked   completed
-                :onClick   (fn [_] (submit :toggle))})
+                :onChange  (fn [_] (submit :toggle))})
       (d/label {:onDoubleClick (fn [_] (submit :begin-editing))} text)
       (d/button {:className :destroy
                  :onClick (fn [_] (submit :destroy))}))
