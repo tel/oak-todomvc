@@ -7,7 +7,9 @@
                  [org.clojure/clojurescript "1.8.40"]
                  [oak "0.1.0-SNAPSHOT"]
                  [prismatic/schema "1.1.0"]
-                 [org.clojure/core.match "0.3.0-alpha4"]]
+                 [org.clojure/core.match "0.3.0-alpha4"]
+                 [bidi "2.0.6"]
+                 [mount "0.1.10"]]
   :plugins [[lein-figwheel "0.5.1"]
             [lein-cljsbuild "1.1.3"]]
   :clean-targets ^{:protect false} ["resources/public/js" "target"]
@@ -16,7 +18,7 @@
   :cljsbuild
   {:builds [{:id "dev"
              :source-paths ["src" "checkouts/oak/src"]
-             :figwheel true
+             :figwheel {:on-jsload oak.examples.todomvc.core/reload}
              :compiler {:main oak.examples.todomvc.core
                         :asset-path "js/out"
                         :output-to "resources/public/js/todomvc.js"

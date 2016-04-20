@@ -27,7 +27,6 @@
         (fn [e] (submit [:Footer e]))))))
 
 (defn step [[target event] state]
-  (println "Ev" target "<--" event)
   (match [target event]
     [:Header [:new-todo text]]
     (oak/step MainSection/root [:new-todo text] state)
