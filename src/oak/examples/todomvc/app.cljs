@@ -7,7 +7,7 @@
 ; -----------------------------------------------------------------------------
 ; Initialization
 
-(def initial-state {:memory {} :order []})
+(def initial-state {:todos {:memory {} :order []}})
 (def initial-cache nil)
 
 ; -----------------------------------------------------------------------------
@@ -36,8 +36,13 @@
 ; -----------------------------------------------------------------------------
 ; Interface
 
-(defn ^:export reset-state [] (reset! state initial-state))
-(defn ^:export reset-oracle [] (reset! cache initial-cache))
+(defn ^:export resetState []
+  (reset! state initial-state)
+  ((:request-render! @app)))
 
-(defn ^:export get-state [] (clj->js @state))
-(defn ^:export get-oracle [] (clj->js @cache))
+(defn ^:export resetOracle []
+  (reset! cache initial-cache)
+  ((:request-render! @app)))
+
+(defn ^:export getState [] (clj->js @state))
+(defn ^:export getOracle [] (clj->js @cache))
