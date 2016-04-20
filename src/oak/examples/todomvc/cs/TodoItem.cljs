@@ -1,7 +1,10 @@
 (ns oak.examples.todomvc.cs.TodoItem
-  (:require [oak.core :as oak]
-            [schema.core :as s]
-            [oak.dom :as d])
+  (:require
+    [oak.core :as oak]
+    [schema.core :as s]
+    [oak.dom :as d]
+    [cljs.core.match :refer-macros [match]]
+    [oak.examples.todomvc.cs.TodoItem.util :as util])
   (:import (goog.string)))
 
 (def state
@@ -17,35 +20,15 @@
     :destroy))
 
 (defn step [event state]
-  (case event
-    :toggle (update state :completed not)))
+  (match event
+    :toggle (update state :completed not)
+    :begin-editing (assoc state :editing true)
+    [:end-editing text] (assoc state
+                          :editing false
+                          :text text)
+    :destroy state))
 
-(def editing-uinput
-  "Absorbs all clicks that aren't in this element and triggers :end-editing
-  with the current value. Also submits :end-editing when enter is hit."
-  (oak/make
-    :state s/Str
-    :event [:end-editing s/Str]
-    :view
-    (fn [text submit]
-      (d/uinput {:onClick    (fn [ev] (.preventPropagation ev))
-                 :onKeyPress (fn [ev]
-                               (when (= "Enter" (.-key ev))
-                                 (submit [:end-editing (.. ev -target -value)])))
-                 :className  :edit
-                 :value      text}))
-    :on-mount
-    (fn [el _ submit]
-      (let [end-edit (fn [ev]
-                       (submit [:end-editing (.. ev -target -value)]))]
-        (set! (.-end-edit el) end-edit)
-        (.. js/document -body
-            (addEventListener "click" end-edit))))
-    :on-unmount
-    (fn [el _ _]
-      (let [end-edit (.-end-edit el)]
-        (.. js/document -body
-            (removeEventListener "click" end-edit))))))
+
 
 (defn view [{:keys [completed editing text]} submit]
   (d/li {:className (d/class-names
@@ -60,7 +43,7 @@
       (d/button {:className :destroy
                  :onClick (fn [_] (submit :destroy))}))
     (when editing
-      (editing-uinput text submit))))
+      (util/editing-uinput text submit))))
 
 (def root
   (oak/make

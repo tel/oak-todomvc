@@ -13,6 +13,7 @@
 (def event
   (s/cond-pre
     :toggle-all
+    [:new-todo s/Str]
     [s/Str (oak/event TodoItem/root)]))
 
 (defn ^:private every-todo [p state]
@@ -31,10 +32,21 @@
       (map-todos #(assoc % :completed false) state)
       (map-todos #(assoc % :completed true) state))
 
+    [:new-todo text]
+    (let [{:keys [id] :as new-todo-state} (TodoItem/fresh text)]
+      (-> state
+          (update :memory assoc id new-todo-state)
+          (update :order conj id)))
+
     [name subevent]
-    (update-in
-      state [:memory name]
-      (oak/step TodoItem/root subevent))))
+    (case subevent
+      :destroy (-> state
+                   (update :memory dissoc name)
+                   (update :order (partial remove (partial = name))))
+
+      (update-in
+        state [:memory name]
+        (oak/step TodoItem/root subevent)))))
 
 (defn view [{:keys [memory order]} submit]
   (d/section {:className :main}
@@ -46,11 +58,13 @@
                           (TodoItem/root
                             (get memory name)
                             (fn [ev] (submit [name ev]))))
-                        order)]
+                        (reverse order))]
       (apply d/ul {:className :todo-list} children))))
 
 (def root
   (oak/make
     :name "MainSection"
     :state state
+    :event event
+    :step step
     :view view))
