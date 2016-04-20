@@ -1,0 +1,16 @@
+/target
+/classes
+/checkouts
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+.hgignore
+.hg/
+node_modules
+.idea/
+oak-todomvc.iml
+resources/public/js
+figwheel_server.log
