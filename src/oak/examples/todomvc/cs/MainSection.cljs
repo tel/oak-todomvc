@@ -54,7 +54,7 @@
                           (TodoItem/root
                             (get memory name)
                             (fn [ev] (submit [name ev]))))
-                        order)]
+                        (reverse order))]
       (apply d/ul {:className :todo-list} children))))
 
 (def root
