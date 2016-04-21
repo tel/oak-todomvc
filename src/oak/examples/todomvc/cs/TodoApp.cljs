@@ -2,6 +2,7 @@
   (:require
     [oak.component :as oak]
     [oak.dom :as d]
+    [oak.schema :as os]
     [cljs.core.match :refer-macros [match]]
     [oak.examples.todomvc.cs.Header :as Header]
     [oak.examples.todomvc.cs.MainSection :as MainSection]
@@ -13,10 +14,15 @@
   {:todos (oak/state MainSection/root)})
 
 (def event
-  (s/cond-pre
-    (s/pair (s/eq :Header) :target (oak/event Header/root) :subevent)
-    (s/pair (s/eq :MainSection) :target (oak/event MainSection/root) :subevent)
-    (s/pair (s/eq :Footer) :target (oak/event Footer/root) :subevent)))
+  (s/conditional
+    (os/cmdp :Header)
+    (os/cmd :Header (oak/event Header/root))
+
+    (os/cmdp :MainSection)
+    (os/cmd :MainSection (oak/event MainSection/root))
+
+    (os/cmdp :Footer)
+    (os/cmd :Footer (oak/event Footer/root))))
 
 (defn query [_state q]
   {:location (q [:location :current])})

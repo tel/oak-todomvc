@@ -2,11 +2,10 @@
   (:require
     [oak.dom :as d]
     [oak.component :as oak]
-    [schema.core :as s]))
+    [schema.core :as s]
+    [oak.schema :as os]))
 
-(def event
-  (s/pair (s/eq :new-todo) :new-todo
-          s/Str :todo-text))
+(def event (os/cmd :new-todo s/Str))
 
 ; This is perhaps better done as a controlled element?
 (defn view [_ submit]

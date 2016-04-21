@@ -2,7 +2,8 @@
   (:require
     [oak.component :as oak]
     [schema.core :as s]
-    [oak.dom :as d]))
+    [oak.dom :as d]
+    [oak.schema :as os]))
 
 (def editing-uinput
   "Absorbs all clicks that aren't in this element and triggers :end-editing
@@ -35,7 +36,7 @@
 
   (oak/make
     :state s/Str
-    :event [:end-editing s/Str]
+    :event (os/cmd :end-editing s/Str)
     :view
     (fn [text submit]
       (d/uinput {:onClick    (fn [ev]

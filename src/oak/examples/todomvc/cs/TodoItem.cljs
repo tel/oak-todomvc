@@ -4,20 +4,23 @@
     [schema.core :as s]
     [oak.dom :as d]
     [cljs.core.match :refer-macros [match]]
-    [oak.examples.todomvc.cs.TodoItem.util :as util])
+    [oak.examples.todomvc.cs.TodoItem.util :as util]
+    [oak.schema :as os])
   (:import (goog.string)))
 
 (def state
-  {:completed s/Bool
+  {:id s/Str
+   :completed s/Bool
    :editing   s/Bool
    :text      s/Str})
 
 (def event
-  (s/enum
-    :toggle
-    :begin-editing
-    [:end-editing s/Str]
-    :destroy))
+  (s/cond-pre
+    (s/enum
+      :toggle
+      :begin-editing
+      :destroy)
+    (os/cmd :end-editing s/Str)))
 
 (defn step [event state]
   (match event

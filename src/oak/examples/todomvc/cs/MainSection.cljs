@@ -5,18 +5,25 @@
     [oak.dom :as d]
     [oak.examples.todomvc.cs.TodoItem :as TodoItem]
     [schema.core :as s]
-    [cljs.core.match :refer-macros [match]]))
+    [cljs.core.match :refer-macros [match]]
+    [oak.schema :as os]))
 
 (def state
   {:memory {s/Str (oak/state TodoItem/root)}
    :order [s/Str]})
 
 (def event
-  (s/cond-pre
-    :toggle-all
-    :clear-completed
-    [:new-todo s/Str]
-    [s/Str (oak/event TodoItem/root)]))
+  (s/conditional
+    keyword?
+    (s/enum
+      :toggle-all
+      :clear-completed)
+
+    (os/cmdp :new-todo)
+    (os/cmd :new-todo s/Str)
+
+    :else
+    (os/targeted s/Str (oak/event TodoItem/root))))
 
 (defn step [event state]
   (match event
