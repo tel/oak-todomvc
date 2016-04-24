@@ -8,11 +8,11 @@
     [cljs.core.match :refer-macros [match]]
     [oak.schema :as os]))
 
-(def state
-  {:memory {s/Str (oak/state TodoItem/root)}
+(def model
+  {:memory {s/Str (oak/model TodoItem/root)}
    :order [s/Str]})
 
-(def event
+(def action
   (s/conditional
     keyword?
     (s/enum
@@ -23,35 +23,35 @@
     (os/cmd :new-todo s/Str)
 
     :else
-    (os/targeted s/Str (oak/event TodoItem/root))))
+    (os/targeted s/Str (oak/action TodoItem/root))))
 
-(defn step [event state]
-  (match event
+(defn step [action model]
+  (match action
     :toggle-all
-    (if (model/every-todo :completed state)
-      (model/map-todos #(assoc % :completed false) state)
-      (model/map-todos #(assoc % :completed true) state))
+    (if (model/every-todo :completed model)
+      (model/map-todos #(assoc % :completed false) model)
+      (model/map-todos #(assoc % :completed true) model))
 
     :clear-completed
-    (model/filter-todos (complement :completed) state)
+    (model/filter-todos (complement :completed) model)
 
     [:new-todo text]
-    (let [{:keys [id] :as new-todo-state} (TodoItem/fresh text)]
-      (-> state
-          (update :memory assoc id new-todo-state)
+    (let [{:keys [id] :as new-todo-model} (TodoItem/fresh text)]
+      (-> model
+          (update :memory assoc id new-todo-model)
           (update :order conj id)))
 
-    [name subevent]
-    (match subevent
-      :destroy (model/destroy-todo name state)
+    [name subaction]
+    (match subaction
+      :destroy (model/destroy-todo name model)
 
-      [:end-editing (text :guard empty?)] (model/destroy-todo name state)
+      [:end-editing (text :guard empty?)] (model/destroy-todo name model)
 
       :else (update-in
-              state [:memory name]
-              (oak/step TodoItem/root subevent)))))
+              model [:memory name]
+              (oak/step TodoItem/root subaction)))))
 
-(defn view [{:keys [memory order]} submit]
+(defn view [{{:keys [memory order]} :model} submit]
   (d/section {:className :main}
     (d/input {:className :toggle-all
               :type :checkbox
@@ -67,7 +67,7 @@
 (def root
   (oak/make
     :name "MainSection"
-    :state state
-    :event event
+    :model model
+    :action action
     :step step
     :view view))

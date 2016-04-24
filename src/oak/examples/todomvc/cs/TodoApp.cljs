@@ -10,35 +10,32 @@
     [schema.core :as s]
     [oak.examples.todomvc.model :as model]))
 
-(def state
-  {:todos (oak/state MainSection/root)})
+(def model
+  {:todos (oak/model MainSection/root)})
 
-(def event
+(def action
   (s/conditional
     (os/cmdp :Header)
-    (os/cmd :Header (oak/event Header/root))
+    (os/cmd :Header (oak/action Header/root))
 
     (os/cmdp :MainSection)
-    (os/cmd :MainSection (oak/event MainSection/root))
+    (os/cmd :MainSection (oak/action MainSection/root))
 
     (os/cmdp :Footer)
-    (os/cmd :Footer (oak/event Footer/root))))
+    (os/cmd :Footer (oak/action Footer/root))))
 
-(defn query [_state q]
-  {:location (q [:location :current])})
-
-(defn step [[target event] state]
-  (match [target event]
+(defn step [[target action] model]
+  (match [target action]
     [:Header [:new-todo text]]
-    (update state :todos (oak/step MainSection/root [:new-todo text]))
+    (update model :todos (oak/step MainSection/root [:new-todo text]))
 
     [:Footer :clear-completed]
-    (update state :todos (oak/step MainSection/root :clear-completed))
+    (update model :todos (oak/step MainSection/root :clear-completed))
 
-    [:MainSection subevent]
-    (update state :todos (oak/step MainSection/root subevent))))
+    [:MainSection subaction]
+    (update model :todos (oak/step MainSection/root subaction))))
 
-(defn view [[{:keys [todos]} {:keys [location]}] submit]
+(defn view [{{:keys [todos]} :model} submit]
   (d/section {:className :todoapp}
     (Header/root nil (fn [e] (submit [:Header e])))
     (MainSection/root todos (fn [e] (submit [:MainSection e])))
@@ -47,15 +44,14 @@
       (when-not (empty? memory)
         (Footer/root
           {:todo-count     (count memory)
-           :location       location
+           :location       :show-all ; constant
            :show-completed (model/some-todo :completed todos)}
           (fn [e] (submit [:Footer e])))))))
 
 (def root
   (oak/make
     :name "TodoApp"
-    :state state
-    :query query
-    :event event
+    :model model
+    :action action
     :step step
     :view view))

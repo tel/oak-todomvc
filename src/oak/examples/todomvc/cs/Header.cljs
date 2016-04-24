@@ -5,7 +5,7 @@
     [schema.core :as s]
     [oak.schema :as os]))
 
-(def event (os/cmd :new-todo s/Str))
+(def action (os/cmd :new-todo s/Str))
 
 ; This is perhaps better done as a controlled element?
 (defn view [_ submit]
@@ -24,5 +24,5 @@
 (def root
   (oak/make
     :name "Header"
-    :event event
+    :action action
     :view view))

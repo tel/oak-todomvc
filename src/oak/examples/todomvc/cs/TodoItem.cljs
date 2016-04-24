@@ -8,13 +8,13 @@
     [oak.schema :as os])
   (:import (goog.string)))
 
-(def state
+(def model
   {:id s/Str
    :completed s/Bool
    :editing   s/Bool
    :text      s/Str})
 
-(def event
+(def action
   (s/cond-pre
     (s/enum
       :toggle
@@ -22,18 +22,16 @@
       :destroy)
     (os/cmd :end-editing s/Str)))
 
-(defn step [event state]
-  (match event
-    :toggle (update state :completed not)
-    :begin-editing (assoc state :editing true)
-    [:end-editing text] (assoc state
+(defn step [action model]
+  (match action
+    :toggle (update model :completed not)
+    :begin-editing (assoc model :editing true)
+    [:end-editing text] (assoc model
                           :editing false
                           :text text)
-    :destroy state))
+    :destroy model))
 
-
-
-(defn view [{:keys [completed editing text]} submit]
+(defn view [{{:keys [completed editing text]} :model} submit]
   (d/li {:className (d/class-names
                       {:checked completed
                        :editing editing})}
@@ -51,9 +49,9 @@
 (def root
   (oak/make
     :name "TodoItem"
-    :keyfn :id
-    :state state
-    :event event
+    :keyfn (comp :id :model)
+    :model model
+    :action action
     :step step
     :view view))
 

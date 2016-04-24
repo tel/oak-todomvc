@@ -5,15 +5,15 @@
     [oak.dom :as d]
     [schema.core :as s]))
 
-(def state
+(def model
   {:todo-count s/Int
    :location s/Keyword
    :show-completed s/Bool})
 
-(def event
+(def action
   (s/enum :clear-completed))
 
-(defn view [{:keys [todo-count show-completed location]} submit]
+(defn view [{{:keys [todo-count show-completed location]} :model} submit]
   (d/footer {:className :footer}
     ; Should be "0 items left" by default
     (d/span {:className :todo-count}
@@ -38,6 +38,6 @@
 (def root
   (oak/make
     :name "Footer"
-    :state state
-    :event event
+    :model model
+    :action action
     :view view))

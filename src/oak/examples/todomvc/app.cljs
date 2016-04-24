@@ -7,17 +7,17 @@
 ; -----------------------------------------------------------------------------
 ; Initialization
 
-(def initial-state {:todos {:memory {} :order []}})
+(def initial-model {:todos {:memory {} :order []}})
 (def initial-cache nil)
 
 ; -----------------------------------------------------------------------------
-; State variables
+; State atoms
 
-(defonce state (atom initial-state))
+(defonce model (atom initial-model))
 (defonce cache (atom initial-cache))
 
 ; -----------------------------------------------------------------------------
-; Runtime state
+; Runtime model
 
 (declare app)
 (mount/defstate app
@@ -26,7 +26,7 @@
   (oak-render/render
     TodoApp/root
     :target (.getElementById js/document "app")
-    :state-atom state
+    :model-atom model
     :cache-atom cache)
 
   :stop
@@ -36,13 +36,13 @@
 ; -----------------------------------------------------------------------------
 ; Interface
 
-(defn ^:export resetState []
-  (reset! state initial-state)
+(defn ^:export resetModel []
+  (reset! model initial-model)
   ((:request-render! @app)))
 
 (defn ^:export resetOracle []
   (reset! cache initial-cache)
   ((:request-render! @app)))
 
-(defn ^:export getState [] (clj->js @state))
+(defn ^:export getModel [] (clj->js @model))
 (defn ^:export getOracle [] (clj->js @cache))
