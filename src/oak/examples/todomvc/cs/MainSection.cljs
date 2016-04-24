@@ -36,10 +36,12 @@
     (model/filter-todos (complement :completed) model)
 
     [:new-todo text]
-    (let [{:keys [id] :as new-todo-model} (TodoItem/fresh text)]
-      (-> model
-          (update :memory assoc id new-todo-model)
-          (update :order conj id)))
+    (if (empty? text)
+      model
+      (let [{:keys [id] :as new-todo-model} (TodoItem/fresh text)]
+        (-> model
+            (update :memory assoc id new-todo-model)
+            (update :order conj id))))
 
     [name subaction]
     (match subaction
