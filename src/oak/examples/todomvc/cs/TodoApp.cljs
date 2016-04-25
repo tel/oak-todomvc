@@ -14,15 +14,10 @@
   {:todos (oak/model MainSection/root)})
 
 (def action
-  (s/conditional
-    (os/cmdp :Header)
-    (os/cmd :Header (oak/action Header/root))
-
-    (os/cmdp :MainSection)
-    (os/cmd :MainSection (oak/action MainSection/root))
-
-    (os/cmdp :Footer)
-    (os/cmd :Footer (oak/action Footer/root))))
+  (os/cond-pair
+    [:Header (oak/action Header/root)]
+    [:MainSection (oak/action MainSection/root)]
+    [:Footer (oak/action Footer/root)]))
 
 (defn step [[target action] model]
   (match [target action]

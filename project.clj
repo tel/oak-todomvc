@@ -5,7 +5,8 @@
             :url "https://opensource.org/licenses/BSD-3-Clause"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.8.40"]
-                 [oak "0.1.0-SNAPSHOT"]
+                 [oak "0.1.3-SNAPSHOT"]
+                 [org.clojure/core.async "0.2.374"]
                  [prismatic/schema "1.1.0"]
                  [org.clojure/core.match "0.3.0-alpha4"]
                  [bidi "2.0.6"]

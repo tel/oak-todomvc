@@ -2,7 +2,8 @@
   (:require
     [mount.core :as mount :include-macros true]
     [oak.render :as oak-render]
-    [oak.examples.todomvc.cs.TodoApp :as TodoApp]))
+    [oak.examples.todomvc.cs.TodoApp :as TodoApp]
+    [cljs.core.async :as async]))
 
 ; -----------------------------------------------------------------------------
 ; Initialization
@@ -17,6 +18,11 @@
 (defonce cache (atom initial-cache))
 
 ; -----------------------------------------------------------------------------
+; Intention
+
+(defonce intent (async/chan))
+
+; -----------------------------------------------------------------------------
 ; Runtime model
 
 (declare app)
@@ -27,7 +33,8 @@
     TodoApp/root
     :target (.getElementById js/document "app")
     :model-atom model
-    :cache-atom cache)
+    :cache-atom cache
+    :intent intent)
 
   :stop
   (let [stop! (:stop! @app)]
@@ -35,6 +42,9 @@
 
 ; -----------------------------------------------------------------------------
 ; Interface
+
+(defn ^:export submitOracle [action]
+  (async/put! intent [:oracle action]))
 
 (defn ^:export resetModel []
   (reset! model initial-model)

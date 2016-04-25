@@ -19,11 +19,10 @@
       :toggle-all
       :clear-completed)
 
-    (os/cmdp :new-todo)
-    (os/cmd :new-todo s/Str)
-
-    :else
-    (os/targeted s/Str (oak/action TodoItem/root))))
+    vector?
+    (os/cond-pair
+      [:new-todo s/Str]
+      [s/Str (oak/action TodoItem/root)])))
 
 (defn step [action model]
   (match action
