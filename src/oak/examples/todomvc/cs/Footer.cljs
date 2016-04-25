@@ -22,7 +22,7 @@
       (if (= 1 todo-count) "item left" "items left"))
     (letfn [(link [this-location name]
               (d/a {:className (d/class-names
-                                 {:select (= this-location location)})
+                                 {:selected (= this-location location)})
                     :href (routes/path-for this-location)}
                 name))]
       (d/ul {:className :filters}

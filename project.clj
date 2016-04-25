@@ -10,6 +10,7 @@
                  [prismatic/schema "1.1.0"]
                  [org.clojure/core.match "0.3.0-alpha4"]
                  [bidi "2.0.6"]
+                 [venantius/accountant "0.1.7"]
                  [mount "0.1.10"]]
   :plugins [[lein-figwheel "0.5.1"]
             [lein-cljsbuild "1.1.3"]]

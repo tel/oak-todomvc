@@ -12,4 +12,4 @@
 
 (defn path-for [location & args]
   (when-let [route (apply bidi/path-for routes location args)]
-    (str "#" route)))
+    route))

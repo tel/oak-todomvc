@@ -19,6 +19,9 @@
     [:MainSection (oak/action MainSection/root)]
     [:Footer (oak/action Footer/root)]))
 
+(defn query [model q]
+  {:location (q [:navigation :get])})
+
 (defn step [[target action] model]
   (match [target action]
     [:Header [:new-todo text]]
@@ -30,7 +33,7 @@
     [:MainSection subaction]
     (update model :todos (oak/step MainSection/root subaction))))
 
-(defn view [{{:keys [todos]} :model} submit]
+(defn view [{{:keys [todos]} :model {:keys [location]} :result} submit]
   (d/section {:className :todoapp}
     (Header/root nil (fn [e] (submit [:Header e])))
     (MainSection/root todos (fn [e] (submit [:MainSection e])))
@@ -39,7 +42,7 @@
       (when-not (empty? memory)
         (Footer/root
           {:todo-count     (count memory)
-           :location       :show-all ; constant
+           :location       location
            :show-completed (model/some-todo :completed todos)}
           (fn [e] (submit [:Footer e])))))))
 
@@ -48,5 +51,6 @@
     :name "TodoApp"
     :model model
     :action action
+    :query query
     :step step
     :view view))
