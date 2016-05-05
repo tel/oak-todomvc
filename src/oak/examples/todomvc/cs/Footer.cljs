@@ -23,7 +23,7 @@
     (letfn [(link [this-location name]
               (d/a {:className (d/class-names
                                  {:selected (= this-location location)})
-                    :href (routes/path-for this-location)}
+                    :href      (str "#" (routes/path-for this-location))}
                 name))]
       (d/ul {:className :filters}
         (d/li {} (link :show-all "All"))

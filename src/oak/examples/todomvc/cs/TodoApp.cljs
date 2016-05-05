@@ -19,8 +19,8 @@
     [:MainSection (oak/action MainSection/root)]
     [:Footer (oak/action Footer/root)]))
 
-(defn query [model q]
-  {:location (q [:navigation :get])})
+(defn query [_model q]
+  {:location (q [:navigation [:current]])})
 
 (defn step [[target action] model]
   (match [target action]
@@ -42,7 +42,7 @@
       (when-not (empty? memory)
         (Footer/root
           {:todo-count     (count memory)
-           :location       location
+           :location       (:handler location)
            :show-completed (model/some-todo :completed todos)}
           (fn [e] (submit [:Footer e])))))))
 

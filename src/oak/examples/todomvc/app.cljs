@@ -3,14 +3,13 @@
     [mount.core :as mount :include-macros true]
     [oak.render :as oak-render]
     [oak.examples.todomvc.cs.TodoApp :as TodoApp]
+    [oak.examples.todomvc.nav :as nav]
+    [oak.oracle.atom-listener :as atom-listener]
     [cljs.core.async :as async]
-    [accountant.core :as accountant]
     [oak.examples.todomvc.routes :as routes]
     [cljs.core.match :refer-macros [match]]
     [oak.oracle :as oracle]
-    [oak.oracle.higher-order :as oracle-ho]
-    [oak.schema :as os]
-    [schema.core :as s]))
+    [oak.oracle.higher-order :as oracle-ho]))
 
 ; -----------------------------------------------------------------------------
 ; Initialization
@@ -30,38 +29,27 @@
 (defonce intent (async/chan))
 
 ; -----------------------------------------------------------------------------
-; Navigation
-
-(defn ^:private landing-at [path]
-  (when-let [location (routes/match path)]
-    (async/put! intent [:oracle [:navigation [:landing location]]])))
-
-(accountant/configure-navigation!
-  {:nav-handler  landing-at
-   :path-exists? routes/match})
-
-; -----------------------------------------------------------------------------
 ; Oracle
 
-(def NavSchema
-  {:handler s/Keyword
-   (s/optional-key :route-params) {s/Keyword s/Any}})
-
-(def o-navigation
-  (oracle/make
-    :model NavSchema
-    :action (os/cond-pair [:landing NavSchema])
-    :query (s/enum :get)
-    :step (fn [action _model]
-            (match action
-              [:landing new-nav] new-nav))
-    :respond (fn [model q]
-               (match q
-                 :get (:handler model)))))
+;(def NavSchema
+;  {:handler s/Keyword
+;   (s/optional-key :route-params) {s/Keyword s/Any}})
+;
+;(def o-navigation
+;  (oracle/make
+;    :model NavSchema
+;    :action (os/cond-pair [:landing NavSchema])
+;    :query (s/enum :get)
+;    :step (fn [action _model]
+;            (match action
+;              [:landing new-nav] new-nav))
+;    :respond (fn [model q]
+;               (match q
+;                 :get (:handler model)))))
 
 (def oracle
   (oracle-ho/parallel
-    {:navigation o-navigation}))
+    {:navigation (atom-listener/oracle nav/locations)}))
 
 ; -----------------------------------------------------------------------------
 ; Runtime model
@@ -69,8 +57,8 @@
 (declare app)
 (mount/defstate app
 
-  :start
-  (oak-render/render
+  :start 10
+  #_(oak-render/render
     TodoApp/root
     :oracle oracle
     :target (.getElementById js/document "app")
@@ -78,10 +66,16 @@
     :cache-atom cache
     :intent intent)
 
-  :stop
-  (let [stop! (:stop! @app)]
+  :stop (+ 2 2)
+  #_(let [stop! (:stop! @app)]
     (stop!)))
-
+(oak-render/render
+    TodoApp/root
+    :oracle oracle
+    :target (.getElementById js/document "app")
+    :model-atom model
+    :cache-atom cache
+    :intent intent)
 ; -----------------------------------------------------------------------------
 ; Interface
 
