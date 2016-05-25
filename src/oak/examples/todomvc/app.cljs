@@ -57,8 +57,8 @@
 (declare app)
 (mount/defstate app
 
-  :start 10
-  #_(oak-render/render
+  :start
+  (oak-render/render
     TodoApp/root
     :oracle oracle
     :target (.getElementById js/document "app")
@@ -66,16 +66,10 @@
     :cache-atom cache
     :intent intent)
 
-  :stop (+ 2 2)
-  #_(let [stop! (:stop! @app)]
+  :stop
+  (let [stop! (:stop! @app)]
     (stop!)))
-(oak-render/render
-    TodoApp/root
-    :oracle oracle
-    :target (.getElementById js/document "app")
-    :model-atom model
-    :cache-atom cache
-    :intent intent)
+
 ; -----------------------------------------------------------------------------
 ; Interface
 
