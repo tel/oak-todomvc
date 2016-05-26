@@ -2,18 +2,9 @@
   (:require
     [oak.examples.todomvc.routes :as routes]
     [oak.component :as oak]
-    [oak.dom :as d]
-    [schema.core :as s]))
+    [oak.dom :as d]))
 
-(def model
-  {:todo-count s/Int
-   :location s/Keyword
-   :show-completed s/Bool})
-
-(def action
-  (s/enum :clear-completed))
-
-(defn view [{{:keys [todo-count show-completed location]} :model} submit]
+(defn view [{:keys [todo-count show-completed location]} submit]
   (d/footer {:className :footer}
     ; Should be "0 items left" by default
     (d/span {:className :todo-count}
@@ -38,6 +29,4 @@
 (def root
   (oak/make
     :name "Footer"
-    :model model
-    :action action
     :view view))

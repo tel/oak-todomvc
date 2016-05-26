@@ -1,15 +1,13 @@
 (ns oak.examples.todomvc.app
   (:require
     [mount.core :as mount :include-macros true]
-    [oak.render :as oak-render]
+    [oak.render :as render]
+    [oak.oracle :as oracle]
     [oak.examples.todomvc.cs.TodoApp :as TodoApp]
     [oak.examples.todomvc.nav :as nav]
     [oak.oracle.atom-listener :as atom-listener]
     [cljs.core.async :as async]
-    [oak.examples.todomvc.routes :as routes]
-    [cljs.core.match :refer-macros [match]]
-    [oak.oracle :as oracle]
-    [oak.oracle.higher-order :as oracle-ho]))
+    [cljs.core.match :refer-macros [match]]))
 
 ; -----------------------------------------------------------------------------
 ; Initialization
@@ -48,7 +46,7 @@
 ;                 :get (:handler model)))))
 
 (def oracle
-  (oracle-ho/parallel
+  (oracle/parallel
     {:navigation (atom-listener/oracle nav/locations)}))
 
 ; -----------------------------------------------------------------------------
@@ -58,13 +56,13 @@
 (mount/defstate app
 
   :start
-  (oak-render/render
+  (render/render
     TodoApp/root
-    :oracle oracle
-    :target (.getElementById js/document "app")
-    :model-atom model
-    :cache-atom cache
-    :intent intent)
+    {:oracle     oracle
+     :target     (.getElementById js/document "app")
+     :model-atom model
+     :cache-atom cache
+     :intent     intent})
 
   :stop
   (let [stop! (:stop! @app)]

@@ -4,25 +4,7 @@
     [oak.component :as oak]
     [oak.dom :as d]
     [oak.examples.todomvc.cs.TodoItem :as TodoItem]
-    [schema.core :as s]
-    [cljs.core.match :refer-macros [match]]
-    [oak.schema :as os]))
-
-(def model
-  {:memory {s/Str (oak/model TodoItem/root)}
-   :order [s/Str]})
-
-(def action
-  (s/conditional
-    keyword?
-    (s/enum
-      :toggle-all
-      :clear-completed)
-
-    vector?
-    (os/cond-pair
-      [:new-todo s/Str]
-      [s/Str (oak/action TodoItem/root)])))
+    [cljs.core.match :refer-macros [match]]))
 
 (defn step [action model]
   (match action
@@ -52,7 +34,7 @@
               model [:memory name]
               (oak/step TodoItem/root subaction)))))
 
-(defn view [{{:keys [memory order]} :model} submit]
+(defn view [{:keys [memory order]} submit]
   (d/section {:className :main}
     (d/input {:className :toggle-all
               :type :checkbox
@@ -68,7 +50,5 @@
 (def root
   (oak/make
     :name "MainSection"
-    :model model
-    :action action
     :step step
     :view view))

@@ -1,11 +1,7 @@
 (ns oak.examples.todomvc.cs.Header
   (:require
     [oak.dom :as d]
-    [oak.component :as oak]
-    [schema.core :as s]
-    [oak.schema :as os]))
-
-(def action (os/cmd :new-todo s/Str))
+    [oak.component :as oak]))
 
 ; This is perhaps better done as a controlled element?
 (defn view [_ submit]
@@ -24,5 +20,4 @@
 (def root
   (oak/make
     :name "Header"
-    :action action
     :view view))
